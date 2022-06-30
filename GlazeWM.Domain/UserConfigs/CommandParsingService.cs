@@ -32,10 +32,9 @@ namespace GlazeWM.Domain.UserConfigs
 
     public Command ParseCommand(string commandString)
     {
+			var commandParts = commandString.Split(" ");
       try
       {
-        var commandParts = commandString.Split(" ");
-
         return commandParts[0] switch
         {
           "layout" => ParseLayoutCommand(commandParts),
@@ -45,14 +44,14 @@ namespace GlazeWM.Domain.UserConfigs
           "set" => ParseSetCommand(commandParts),
           "toggle" => ParseToggleCommand(commandParts),
           "exit" => ParseExitCommand(commandParts),
-          "swap_monitors" => new SwapMonitorsCommand(),
+          "swap_monitors" => ParseSwapMonitorsCommand(commandParts),
           "close" => new CloseFocusedWindowCommand(),
           _ => throw new ArgumentException(null, nameof(commandString)),
         };
       }
       catch
       {
-        throw new FatalUserException($"Invalid command '{commandString}'.");
+        throw new FatalUserException($"Invalid command '{commandString}, {commandParts[0]}'.");
       }
     }
 
@@ -77,6 +76,20 @@ namespace GlazeWM.Domain.UserConfigs
         "workspace" => new FocusWorkspaceCommand(ValidateWorkspaceName(commandParts[2])),
         _ => throw new ArgumentException(null, nameof(commandParts)),
       };
+    }
+
+    private Command ParseSwapMonitorsCommand(string[] commandParts)
+    {
+      return commandParts[1] switch
+      {
+        "left" => new SwapMonitorsCommand(Direction.LEFT),
+        "right" => new SwapMonitorsCommand(Direction.RIGHT),
+        "up" => new SwapMonitorsCommand(Direction.UP),
+        "down" => new SwapMonitorsCommand(Direction.DOWN),
+        // "to" => new SwapFocusedWindowToMonitorCommand(ValidateWorkspaceName(commandParts[3])), TODO
+        _ => throw new ArgumentException(),
+      };
+		// new SwapMonitorsCommand()
     }
 
     private Command ParseMoveCommand(string[] commandParts)

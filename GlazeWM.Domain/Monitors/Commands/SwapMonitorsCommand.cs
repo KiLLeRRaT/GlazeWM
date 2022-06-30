@@ -8,6 +8,11 @@ namespace GlazeWM.Domain.Monitors.Commands
 {
   public class SwapMonitorsCommand : Command
   {
-    public SwapMonitorsCommand() { }
+    public Direction Direction { get; }
+
+    public SwapMonitorsCommand(Direction direction)
+    {
+      Direction = direction;
+    }
   }
 }
